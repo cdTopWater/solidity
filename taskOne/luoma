@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ~0.8.0;
+
+
+contract Loma {
+    
+
+    function exchangeLuoma(string memory params)public pure returns (uint256) {
+        uint256 result =0;
+        //sdf
+        string[7] memory baseBytes = ["I","V","X","L","C","D","M"];
+        uint16[7] memory baseBytesNUm = [1,5,10,50,100,500,1000];
+        string[6] memory baseBytesTow = ["IV","IX","XL","XC","CD","CM"];
+        uint16[6] memory baseBytesTowNUm = [4,9,40,90,400,900];
+        //
+        bytes memory soureBytes = bytes(params);
+        uint256 len = soureBytes.length;
+        for (uint16 i=0;i<len;i++){
+            if(i<len-1){
+                //两个匹配
+                uint8 index = getbytesTow(soureBytes[i],soureBytes[i+1],baseBytesTow);
+                if(index!=99){
+                    //两位的找到了
+                    result += baseBytesTowNUm[index];
+                    i++;
+                    continue ;
+                }
+            }
+            //单个匹配
+            for (uint8 j=0;j<baseBytes.length;j++){
+                if (soureBytes[i]==bytes(baseBytes[j])[0]){
+                    result += baseBytesNUm[j];
+                    continue ;
+                }
+            }
+            
+        }
+
+        return result;
+    }
+
+
+    function getbytesTow(bytes1  one ,bytes1  tow,string[6] memory baseBytesTow)public pure returns (uint8) {
+        for (uint8 i=0;i<baseBytesTow.length;i++) {
+            bytes memory arrays = bytes(baseBytesTow[i]);
+            if (arrays[0]==one && arrays[1]==tow){
+                return i;
+            }
+        }
+        return 99;
+    }
+
+
+}
