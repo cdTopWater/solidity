@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ~0.8.0;
+
+
+import "@openzeppelin/contracts/utils/Strings.sol";
+
+contract NumToLuoma {
+    using Strings for uint16;
+    using Strings for int16;
+
+    function exchangeLuoma(uint16 num)public pure returns (string memory) {
+        if (num==0 || num>3999){
+            return num.toString();
+        }
+        //sdf
+        string[13] memory baseBytes = ["I","V","X","L","C","D","M","IV","IX","XL","XC","CD","CM"];
+        uint16[13] memory baseBytesNum = [1,5,10,50,100,500,1000,4,9,40,90,400,900];
+        
+        string memory result ;
+        uint256 len = bytes(num.toString()).length;
+        for(uint8 i=0;i<len;i++){
+            uint16 zero = getZero(uint8(len-1-i));
+            uint16 first = num / zero;
+            string memory bit = getAppropriateValue(1,first*zero,baseBytesNum,baseBytes);
+            if(bytes(bit).length==0){
+                bit = getAppropriateValue(first,zero,baseBytesNum,baseBytes);
+            }
+            result = string(abi.encodePacked(result,bit));
+            num = num-first*zero;
+        }
+        return result;
+    }
+    
+    function getZero(uint8 len) public pure returns (uint16) {
+        uint16 result =1;
+        for(uint8 i=0;i<len;i++){
+            result *= 10;
+        }  
+        return result;
+    }
+
+
+    function getAppropriateValue(uint16 quantity,uint16 num,uint16[13] memory numList,string[13] memory numString) public  pure returns (string memory) {
+        string memory result;
+        for(uint8 i=0;i<numList.length;i++){
+            if (numList[i] == num){
+                while (quantity > 0){
+                    result = string(abi.encodePacked(result, numString[i]));
+                    quantity--;
+                }
+                break ;
+            }
+        }
+        return result;
+    }
+
+    function testStr(string memory params1,string memory params2)public pure returns (string memory) {
+        string memory result ;
+        result = string(abi.encodePacked(result,params1));
+        return string(abi.encodePacked(result,params2));
+    }
+
+
+}
